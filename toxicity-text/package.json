@@ -9,10 +9,11 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo/metro-runtime": "^3.2.1",
     "@react-native-async-storage/async-storage": "^1.23.1",
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/native-stack": "^6.9.26",
-    "@tensorflow-models/toxicity": "^1.2.2",
+    "@tensorflow-models/toxicity": "^1.0.3",
     "@tensorflow/tfjs": "^4.20.0",
     "@tensorflow/tfjs-react-native": "^1.0.0",
     "expo": "~51.0.9",

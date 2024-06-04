@@ -12,7 +12,7 @@ export const toxicityClassifier = async (text) => {
     "toxicity",
   ];
 
-  const model = await toxicity.load(threshold, toxicityLabels);
+  const model = await toxicity.load(threshold);
   console.log(model)
   const sentences = [text]; 
   console.log(sentences);
