@@ -32,9 +32,9 @@ export default function Home() {
     return (
         <View style={styles.container}>
 
-            {toxicityLevel === null && <Text>Verifique a agressividade de seu texto</Text>}
-            {toxicityLevel === 'extremamente ofensivo' && <Text style={styles.toxicText}>Conteúdo extremamente ofensivo</Text>}
-            {toxicityLevel === 'ofensivo' && <Text style={styles.toxicText}>Conteúdo ofensivo</Text>}
+            {toxicityLevel === null && <Text style={styles.toxicText}>Verifique a agressividade de seu texto</Text>}
+            {toxicityLevel === 'extremamente ofensivo' && <Text style={styles.toxicText}>Conteúdo extremamente tóxico</Text>}
+            {toxicityLevel === 'ofensivo' && <Text style={styles.safeText}>Conteúdo ofensivo</Text>}
             {toxicityLevel === 'nao_ofensivo' && <Text style={styles.safeText}>Conteúdo não ofensivo</Text>}
 
             <TextInput
@@ -42,10 +42,11 @@ export default function Home() {
                 value={text}
                 onChangeText={setText}
                 placeholder="Digite aqui..."
+                placeholderTextColor="#fff"
             />
 
             <TouchableOpacity onPress={() => toxicityClassifier(text)}>
-                <Text style={styles.button}>Verificar Toxicidade</Text>
+            <Text style={[styles.button, {textAlign: 'center', textAlignVertical: 'center'}]}>Verificar</Text>
             </TouchableOpacity>
 
 
