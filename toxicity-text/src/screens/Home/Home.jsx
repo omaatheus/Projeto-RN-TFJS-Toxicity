@@ -1,25 +1,55 @@
-import { StatusBar } from 'expo-status-bar';
-import {Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 import styles from '../../components/styles/Home/Home';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { toxicityClassifier } from '../../lib/Tensorflow/Toxicity';
 
 export default function Home() {
-    const [model, setModel] = useState()
+
+    const [text, setText] = useState('');
+    const [toxicityLevel, setToxicityLevel] = useState(null);
+
+    useEffect(() => {
+        if (text.trim() === '') { //se o texto estiver vazio após remover espaços em branco
+            setToxicityLevel(null); //reinicia o nível de toxicidade para null
+            return;
+        }
+
+        toxicityClassifier(text).then(predictions => { //chama a função, que retornará uma promessa
+            const toxicPredictions = predictions.filter(p => p.results[0].match); //filtra as previsões consideradas tóxicas
+
+            if (toxicPredictions.length > 0) { //se houver pelo menos uma previsão tóxica
+                const mostToxicLabel = toxicPredictions.reduce((prev, current) => //encontra a previsão mais tóxica
+                    prev.results[0].probabilities[1] > current.results[0].probabilities[1] ? prev : current
+                ).label; //obtém a taxa da previsão mais tóxica
+
+                setToxicityLevel(mostToxicLabel === 'severe_toxicity' ? 'extremamente ofensivo' : 'ofensivo');
+            } else {
+                setToxicityLevel('nao_ofensivo');
+            }
+        });
+    }, [text]);
 
     return (
         <View style={styles.container}>
-            <StatusBar style="auto" />
-            <Text>{model}</Text>
 
-            <TextInput 
-            placeholder='Digite aq'
-            value={model}
-            onChangeText={setModel}
-            >
-            </TextInput>
+            {toxicityLevel === null && <Text>Verifique a agressividade de seu texto</Text>}
+            {toxicityLevel === 'extremamente ofensivo' && <Text style={styles.toxicText}>Conteúdo extremamente ofensivo</Text>}
+            {toxicityLevel === 'ofensivo' && <Text style={styles.toxicText}>Conteúdo ofensivo</Text>}
+            {toxicityLevel === 'nao_ofensivo' && <Text style={styles.safeText}>Conteúdo não ofensivo</Text>}
 
-            <TouchableOpacity><Text>Botao Clicavel</Text></TouchableOpacity>
+            <TextInput
+                style={styles.input}
+                value={text}
+                onChangeText={setText}
+                placeholder="Digite aqui..."
+            />
+
+            <TouchableOpacity onPress={() => toxicityClassifier(text)}>
+                <Text style={styles.button}>Verificar Toxicidade</Text>
+            </TouchableOpacity>
+
 
         </View>
+
     );
 }
