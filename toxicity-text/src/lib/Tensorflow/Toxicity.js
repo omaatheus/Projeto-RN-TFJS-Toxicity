@@ -1,7 +1,7 @@
 import * as toxicity from '@tensorflow-models/toxicity';
 
 export const toxicityClassifier = async (text) => { 
-  const threshold = 0.67;
+  const threshold = 0.75;
   const toxicityLabels = [
     "identity_attack",
     "insult",
