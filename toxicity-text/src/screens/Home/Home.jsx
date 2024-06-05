@@ -1,12 +1,30 @@
-import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Text, TextInput, TouchableOpacity, View, FlatList } from 'react-native';
 import styles from '../../components/styles/Home/Home';
 import { useState, useEffect } from 'react';
 import { toxicityClassifier } from '../../lib/Tensorflow/Toxicity';
+import { any } from '@tensorflow/tfjs';
 
 export default function Home() {
 
     const [text, setText] = useState('');
     const [toxicityLevel, setToxicityLevel] = useState(null);
+    const [posts, setPosts] = useState();
+
+    
+
+    function NovoPost () {
+        if(posts.length > 0 ){
+            Math.max(...posts.map(post => post.id)) + 1
+        }
+            return message;
+      };
+
+      const renderizarPost = ({ item }) => (
+        <View style={styles.postContainer}>
+          <Text style={styles.postContent}>{item.content}</Text>
+        </View>
+      );
+    
 
     useEffect(() => {
         if (text.trim() === '') { //se o texto estiver vazio após remover espaços em branco
@@ -27,15 +45,23 @@ export default function Home() {
                 setToxicityLevel('nao_ofensivo');
             }
         });
-    }, [text]);
+    });
 
     return (
         <View style={styles.container}>
 
             {toxicityLevel === null && <Text style={styles.toxicText}>Verifique a agressividade de seu texto</Text>}
             {toxicityLevel === 'extremamente ofensivo' && <Text style={styles.toxicText}>Conteúdo extremamente tóxico</Text>}
-            {toxicityLevel === 'ofensivo' && <Text style={styles.safeText}>Conteúdo ofensivo</Text>}
-            {toxicityLevel === 'nao_ofensivo' && <Text style={styles.safeText}>Conteúdo não ofensivo</Text>}
+            {toxicityLevel === 'ofensivo' && <Text style={styles.toxicText}>Conteúdo ofensivo</Text>}
+            {toxicityLevel === 'nao_ofensivo' && <Text style={styles.toxicText}>Conteúdo não ofensivo</Text>}
+
+            if (NovoPost){ 
+                <FlatList
+                    data={posts}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={renderizarPost}
+                />
+            } 
 
             <TextInput
                 style={styles.input}
