@@ -1,58 +1,71 @@
 import { Text, TextInput, TouchableOpacity, View, FlatList } from 'react-native';
 import styles from '../../components/styles/Home/Home';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { toxicityClassifier } from '../../lib/Tensorflow/Toxicity';
+import mensagensDeAvisoDicionario from '../../lib/utils/mensagensDeAvisoDicionario';
 
 export default function Home() {
-    
-    const [text, setText] = useState('');
-    const [toxicityLevel, setToxicityLevel] = useState(null);
+  const [text, setText] = useState('');
+  const [toxicityResults, setToxicityResults] = useState([]);
+  const [textHistory, setTextHistory] = useState([]);
 
-    function TextClassifier() {
-        if (text.trim() === '') { //se o texto estiver vazio após remover espaços em branco
-            setToxicityLevel(null); //reinicia o nível de toxicidade para null
-            return;
-        }
+  const TextClassifier = async () => {
+    if (text.trim() !== '') {
+      const predictions = await toxicityClassifier(text);
+      const toxicPredictions = predictions.filter(p => p.results[0].match);
 
-        toxicityClassifier(text).then(predictions => { //chama a função, que retornará uma promessa
-            const toxicPredictions = predictions.filter(p => p.results[0].match); //filtra as previsões consideradas tóxicas
+      const results = toxicPredictions.map(prediction => ({
+        label: prediction.label,
+        message: mensagensDeAvisoDicionario[prediction.label] || 'Conteúdo potencialmente problemático.'
+      }));
 
-            if (toxicPredictions.length > 0) { //se houver pelo menos uma previsão tóxica
-                const mostToxicLabel = toxicPredictions.reduce((prev, current) => //encontra a previsão mais tóxica
-                    prev.results[0].probabilities[1] > current.results[0].probabilities[1] ? prev : current
-                ).label; //obtém a taxa da previsão mais tóxica         
-                
-                setToxicityLevel(mostToxicLabel === 'severe_toxicity' ? 'extremamente ofensivo' : 'ofensivo');
-            } else {
-                setToxicityLevel('nao_ofensivo');
-            }
-        });
+      setToxicityResults(results);
+      setTextHistory([text, ...textHistory]);
     }
+  };
 
-    
-
-    return (
-        <View style={styles.container}>
-
-            {toxicityLevel === null && <Text style={styles.toxicText}>Verifique a agressividade de seu texto</Text>}
-            {toxicityLevel === 'extremamente ofensivo' && <Text style={styles.toxicText}>Conteúdo extremamente tóxico</Text>}
-            {toxicityLevel === 'ofensivo' && <Text style={styles.safeText}>Conteúdo ofensivo</Text>}
-            {toxicityLevel === 'nao_ofensivo' && <Text style={styles.safeText}>Conteúdo não ofensivo</Text>}
-
-            <TextInput
-                style={styles.input}
-                value={text}
-                onChangeText={setText}
-                placeholder="Digite aqui..."
-                placeholderTextColor="#fff"
-            />
-
-            <TouchableOpacity onPress={() => TextClassifier(text)}>
-            <Text style={[styles.button, {textAlign: 'center', textAlignVertical: 'center'}]}>Verificar</Text>
-            </TouchableOpacity>
+  return (
+    <View style={styles.container}>
+      {/* mensagem condicional exibirá caso não houver resultados */}
+      {toxicityResults.length === 0 ? (
+        <Text style={styles.toxicitytext}>Verifique a agressividade de seu texto</Text>
+      ) : (
 
 
-        </View>
+        console.log("toxicityResults:", toxicityResults),
+        console.log("textHistory:", textHistory),
 
-    );
+
+        <>
+          {/* lista os resultados da classificação, apenas se houver resultados */}
+          <FlatList 
+            data={toxicityResults}
+            renderItem={({ item }) => <Text style={styles.toxicText}>{item.message}</Text>}
+            keyExtractor={(item, index) => index.toString()}
+          />
+
+          {/* lista o histórico de textos digitados, entretanto apenas se houver resultados */}
+          <FlatList 
+            data={textHistory}
+            renderItem={({ item }) => <Text style={styles.historyItem}>{item}</Text>}
+            keyExtractor={(item, index) => index.toString()}
+          />
+        </>
+      )}
+
+      <TextInput
+        style={styles.input}
+        value={text}
+        onChangeText={setText}
+        placeholder="Digite aqui..."
+        placeholderTextColor="#fff"
+      />
+
+      <TouchableOpacity onPress={TextClassifier}>
+        <Text style={[styles.button, { textAlign: 'center', textAlignVertical: 'center' }]}>
+          Verificar
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
 }

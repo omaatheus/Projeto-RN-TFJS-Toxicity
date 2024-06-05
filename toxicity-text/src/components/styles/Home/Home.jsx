@@ -14,12 +14,19 @@ const styles = StyleSheet.create({
         alignItems: 'center', // centralizar texto no eixo horizontal
     },
 
-    toxicText: {
+    toxicitytext: {
       color: 'white',
-      fontSize: 40,
+      fontSize: 33,
       fontWeight: 'bold', // texto em negrito
       marginHorizontal: 20, // espaçamento das bordas laterais
-      marginTop: 230,
+      marginTop: 130,
+    },
+    toxicText: {
+      color: 'white',
+      fontSize: 20,
+      fontWeight: 'bold', // texto em negrito
+      marginHorizontal: 20, // espaçamento das bordas laterais
+      marginTop: 10,
     },
 
     input: {
