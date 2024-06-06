@@ -1,22 +1,21 @@
 import * as toxicity from '@tensorflow-models/toxicity';
 
-export const toxicityClassifier = async (text) => { 
-  const threshold = 0.75;
-  const toxicityLabels = [
-    "identity_attack",
-    "insult",
-    "obscene",
-    "severe_toxicity",
-    "sexual_explicit",
-    "threat",
-    "toxicity",
-  ];
 
-  const model = await toxicity.load(threshold);
-  console.log(model)
-  const sentences = [text]; 
-  console.log(sentences);
+export const toxicityLabels = [
+  "identity_attack",
+  "insult",
+  "obscene",
+  "severe_toxicity",
+  "sexual_explicit",
+  "threat",
+  "toxicity",
+];
 
-  return model.classify(sentences); //retorna a promessa diretamente
-};
-
+export async function toxicityClassifier(sentenca) {
+  const threshold = 0.9;
+  const model = await toxicity.load(threshold, toxicityLabels)
+  const sentences = [sentenca];
+  const predictions = await model.classify(sentences)
+  return predictions
+  
+}
