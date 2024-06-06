@@ -47,6 +47,7 @@ const styles = StyleSheet.create({
       borderRadius: 30,
       fontSize: 15,
       fontWeight: 'bold',
+      overflow: 'hidden',
       },
       
     safeText: {
