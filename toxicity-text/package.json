@@ -16,6 +16,7 @@
     "@tensorflow-models/toxicity": "^1.0.3",
     "@tensorflow/tfjs": "^4.20.0",
     "@tensorflow/tfjs-react-native": "^1.0.0",
+    "@types/react": "~18.2.79",
     "expo": "51.0.10",
     "expo-camera": "^15.0.10",
     "expo-gl": "^14.0.2",

@@ -3,6 +3,8 @@ import styles from '../../components/styles/Home/Home';
 import { useState } from 'react';
 import { toxicityClassifier } from '../../lib/Tensorflow/Toxicity';
 import mensagensDeAvisoDicionario from '../../lib/utils/mensagensDeAvisoDicionario';
+import ButtonVerify from '../../components/Button/ButtonVerify';
+// import InputText from '../../components/InputTextFoda/InputText';
 
 export default function Home() {
   const [text, setText] = useState('');
@@ -13,6 +15,8 @@ export default function Home() {
     if (text.trim() !== '') {
       const predictions = await toxicityClassifier(text);
       const toxicPredictions = predictions.filter(p => p.results[0].match);
+
+      console.log(predictions);
 
       const results = toxicPredictions.map(prediction => ({
         label: prediction.label,
@@ -38,20 +42,26 @@ export default function Home() {
 
         <>
           {/* lista os resultados da classificação, apenas se houver resultados */}
-          <FlatList 
+          <FlatList
             data={toxicityResults}
             renderItem={({ item }) => <Text style={styles.toxicText}>{item.message}</Text>}
             keyExtractor={(item, index) => index.toString()}
           />
 
           {/* lista o histórico de textos digitados, entretanto apenas se houver resultados */}
-          <FlatList 
+          <FlatList
             data={textHistory}
             renderItem={({ item }) => <Text style={styles.historyItem}>{item}</Text>}
             keyExtractor={(item, index) => index.toString()}
           />
         </>
       )}
+
+      {/* <InputText 
+      placeholder="Digite Aqui..."
+      value={text}
+      onChangeText={setText}
+      /> */}
 
       <TextInput
         style={styles.input}
@@ -61,11 +71,9 @@ export default function Home() {
         placeholderTextColor="#fff"
       />
 
-      <TouchableOpacity onPress={TextClassifier}>
-        <Text style={[styles.button, { textAlign: 'center', textAlignVertical: 'center' }]}>
-          Verificar
-        </Text>
-      </TouchableOpacity>
+      <ButtonVerify
+        onPress={TextClassifier}
+      />
     </View>
   );
 }
